@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Identity -->
+    <string name="app_name">SmartBox</string>
+
+    <!-- Header & Search -->
+    <string name="welcome_title">SmartBox</string>
+    <string name="welcome_subtitle">Keep your favorite recipes organized in one place ✨</string>
+    <string name="get_started">Get Started 👨‍🍳</string>
+    <string name="search_hint">Search recipes...</string>
+
+    <!-- Add Recipe Screen -->
+    <string name="add_recipe_title">Add New Recipe 📝</string>
+    <string name="recipe_name_hint">Recipe name 🥘</string>
+    <string name="cook_time_hint">Cook time (minutes) ⏱️</string>
+    <string name="ingredients_hint">Ingredients (comma separated) 🛒</string>
+    <string name="tags_hint">Tags (e.g., Breakfast, Quick) 🏷️</string>
+    <string name="save_recipe">Save Recipe 💾</string>
+
+    <!-- Detail Screen -->
+    <string name="start_timer">⏳ Start Timer</string>
+    <string name="share_recipe">📤 Share Recipe</string>
+</resources>

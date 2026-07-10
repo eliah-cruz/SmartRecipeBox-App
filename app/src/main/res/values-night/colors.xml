@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Mode Brand Colors -->
+    <color name="primary">#FF7043</color>
+    <color name="primary_dark">#E65100</color>
+    <color name="primary_variant">#E65100</color>
+    <color name="accent">#FFB300</color>
+
+    <!-- Theme-Aware Card Gradients (Dark) -->
+    <color name="card_gradient_start">#26201D</color>
+    <color name="card_gradient_end">#1C1C1C</color>
+
+    <!-- Theme-Aware Base Background Gradients (Dark) -->
+    <color name="bg_start">#121212</color>
+    <color name="bg_end">#1C1816</color>
+    <color name="card_surface">#1F1F1F</color>
+
+    <!-- Highly visible text colors for Dark Mode -->
+    <color name="text_primary">#E0E0E0</color>
+    <color name="text_secondary">#F5F5F5</color> <!-- Pure Off-White (Fixes invisible tags) -->
+    <color name="border_color">#332A24</color>
+
+    <!-- Intro Helpers -->
+    <color name="intro_text_start">#F6F6F6</color>
+    <color name="intro_text_end">#FFE0B2</color>
+</resources>

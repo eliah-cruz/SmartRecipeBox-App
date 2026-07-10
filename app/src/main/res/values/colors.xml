@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="primary">#E65100</color>
+    <color name="primary_dark">#BF360C</color>
+    <color name="primary_variant">#BF360C</color>
+    <color name="accent">#FF9100</color>
+
+    <!-- Theme-Aware Card Gradients (Light) -->
+    <color name="card_gradient_start">#FFFDFB</color>
+    <color name="card_gradient_end">#FFF0E8</color>
+
+    <!-- Theme-Aware Base Background Gradients (Light) -->
+    <color name="bg_start">#FFF3ED</color>
+    <color name="bg_end">#FFF9F6</color>
+    <color name="card_surface">#F6F6F6</color>
+
+    <!-- Readable dark text colors for Light Mode -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#555555</color>
+    <color name="border_color">#E6DAD3</color>
+
+    <!-- Intro Helpers -->
+    <color name="intro_text_start">#F6F6F6</color>
+    <color name="intro_text_end">#FFE0B2</color>
+
+    <color name="white">#F6F6F6</color>
+    <color name="black">#161616</color>
+    <color name="gray">#757575</color>
+</resources>
