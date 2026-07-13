@@ -1,6 +1,7 @@
 package com.example.smartrecipebox.fragments
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -106,6 +107,22 @@ class RecipeListFragment : Fragment() {
         view.findViewById<Button>(R.id.btn_theme_toggle).setOnClickListener {
             ThemeHelper.toggleTheme(requireContext())
             requireActivity().recreate()
+        }
+
+        // ==========================================
+        // NEW CODE: Logout Button Logic
+        // ==========================================
+        val btnLogout = view.findViewById<Button>(R.id.btnLogout)
+        btnLogout.setOnClickListener {
+            // Open SharedPreferences and change "isLoggedIn" to false
+            val sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+            sharedPreferences.edit().putBoolean("isLoggedIn", false).apply()
+
+            // Show a quick message
+            Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show()
+
+            // Send the user back to the Login Screen
+            (activity as MainActivity).loadFragment(LoginFragment())
         }
 
         val filters = listOf(

@@ -1,171 +1,197 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/bg_app_gradient"
-    android:padding="16dp">
+    android:background="@drawable/bg_app_gradient">
 
-    <!-- Top Header Row -->
+    <!-- MAIN SCREEN CONTENT -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="16dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <TextView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_logo_circle"
-            android:text="🍳"
-            android:textSize="24sp"
-            android:gravity="center"
-            android:layout_marginEnd="12dp"
-            android:elevation="2dp"/>
-
-        <TextView
-            android:id="@+id/tv_title_header"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="SmartBox"
-            android:textColor="@color/text_primary"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btn_theme_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginEnd="8dp"
-            android:minWidth="0dp"
-            android:paddingHorizontal="12dp"
-            android:text="🌓 Theme"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="12sp" />
-
-        <Button
-            android:id="@+id/btn_add_recipe"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="0dp"
-            android:paddingHorizontal="12dp"
-            android:text="✚ Add"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <!-- Search Bar -->
-    <EditText
-        android:id="@+id/et_search"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/search_bar_background"
-        android:drawableStart="@android:drawable/ic_menu_search"
-        android:drawableEnd="@android:drawable/ic_menu_close_clear_cancel"
-        android:drawablePadding="12dp"
-        android:hint="@string/search_hint"
-        android:inputType="text"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textColor="@color/text_primary"
-        android:textColorHint="@color/text_secondary"
-        android:textSize="15sp" />
-
-    <!-- Filter Chips Horizontal Scroll -->
-    <HorizontalScrollView
-        android:id="@+id/horizontalScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:layout_marginBottom="16dp">
-
+        <!-- Top Header Row -->
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingStart="2dp"
-            android:paddingEnd="16dp">
-
-            <Button
-                android:id="@+id/chip_all"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="8dp"
-                android:minWidth="0dp"
-                android:paddingHorizontal="16dp"
-                android:text="All"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="13sp" />
-
-            <Button
-                android:id="@+id/chip_quick"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="8dp"
-                android:minWidth="0dp"
-                android:paddingHorizontal="16dp"
-                android:text="⚡ Quick"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="13sp" />
-
-            <Button
-                android:id="@+id/chip_breakfast"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="8dp"
-                android:minWidth="0dp"
-                android:paddingHorizontal="16dp"
-                android:text="🍳 Breakfast"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="13sp" />
-
-            <Button
-                android:id="@+id/chip_dinner"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="8dp"
-                android:minWidth="0dp"
-                android:paddingHorizontal="16dp"
-                android:text="🍲 Dinner"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="13sp" />
-
-            <Button
-                android:id="@+id/chip_dessert"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="8dp"
-                android:minWidth="0dp"
-                android:paddingHorizontal="16dp"
-                android:text="🍰 Dessert"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="13sp" />
-        </LinearLayout>
-    </HorizontalScrollView>
-
-    <!-- Recipes List ScrollView -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:id="@+id/recipes_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-</LinearLayout>
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_logo_circle"
+                android:text="🍳"
+                android:textSize="24sp"
+                android:gravity="center"
+                android:layout_marginEnd="12dp"
+                android:elevation="2dp"/>
+
+            <TextView
+                android:id="@+id/tv_title_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="SmartBox"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:maxLines="1" />
+
+            <Button
+                android:id="@+id/btn_theme_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="🌓 Theme"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_add_recipe"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="✚ Add"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Search Bar -->
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/search_bar_background"
+            android:drawableStart="@android:drawable/ic_menu_search"
+            android:drawableEnd="@android:drawable/ic_menu_close_clear_cancel"
+            android:drawablePadding="12dp"
+            android:hint="@string/search_hint"
+            android:inputType="text"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:textSize="15sp" />
+
+        <!-- Filter Chips Horizontal Scroll -->
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="2dp"
+                android:paddingEnd="16dp">
+
+                <Button
+                    android:id="@+id/chip_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="All"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/chip_quick"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="⚡ Quick"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/chip_breakfast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="🍳 Breakfast"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/chip_dinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="🍲 Dinner"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/chip_dessert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="🍰 Dessert"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Recipes List ScrollView -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/recipes_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="80dp" /> <!-- Added padding so the last recipe isn't hidden behind the button -->
+        </ScrollView>
+
+    </LinearLayout>
+
+    <!-- FLOATING LOGOUT BUTTON AT THE BOTTOM -->
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="24dp"
+        android:paddingHorizontal="24dp"
+        android:text="🚪 Logout"
+        android:textAllCaps="false"
+        android:backgroundTint="#FF4444"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:elevation="8dp" />
+
+</RelativeLayout>
