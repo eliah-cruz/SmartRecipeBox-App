@@ -40,11 +40,36 @@ class AddRecipeActivity : AppCompatActivity() {
             val ingredientsText = etIngredients.text.toString().trim()
             val tagsText = etTags.text.toString().trim()
 
-            if (name.isEmpty() || timeText.isEmpty() || ingredientsText.isEmpty()) {
-                Toast.makeText(this, "Please fill in the required fields.", Toast.LENGTH_SHORT).show()
+            // 1. Check if every single box is filled out
+            var isFormValid = true
+
+            if (name.isEmpty()) {
+                etName.error = "Recipe Name is required"
+                isFormValid = false
+            }
+
+            if (timeText.isEmpty()) {
+                etTime.error = "Cook Time is required"
+                isFormValid = false
+            }
+
+            if (ingredientsText.isEmpty()) {
+                etIngredients.error = "Ingredients are required"
+                isFormValid = false
+            }
+
+            if (tagsText.isEmpty()) {
+                etTags.error = "Tags are required"
+                isFormValid = false
+            }
+
+            // 2. If any box is empty, stop here and do not save.
+            if (!isFormValid) {
+                Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
+            // 3. If everything is filled out perfectly, save the recipe!
             val timeMinutes = timeText.toIntOrNull() ?: 15
 
             // Split ingredients into a List<String>
