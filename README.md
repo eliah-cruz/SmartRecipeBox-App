@@ -52,7 +52,7 @@ The frontend UI, fragment navigation, user interactions, and layouts have been f
    - *Task:* Replace local repository calls with real-time Firestore listeners (`addSnapshotListener`) to load and display cloud recipes dynamically.
 
 3. **Authentication:**
-   - Implement **Firebase Auth** if user-specific recipe boxes or a login/signup screen is required.
+   - Implement **Supabase Auth** if user-specific recipe boxes or a login/signup screen is required.
 
 ---
 
