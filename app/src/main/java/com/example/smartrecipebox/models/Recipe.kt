@@ -1,13 +1,23 @@
 package com.example.smartrecipebox.models
 
-import java.io.Serializable
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Recipe(
-    val id: String,
+    val id: String = "",
     val title: String,
     val timeMinutes: Int,
     val ingredients: List<String>,
     val tags: Set<String>
-) : Serializable
+) : java.io.Serializable
 
 fun Recipe.isQuick(): Boolean = this.timeMinutes <= 20
+
+@Serializable
+data class NewRecipeRequest(
+    val title: String,
+    val timeMinutes: Int,
+    val ingredients: List<String>,
+    val tags: Set<String>
+)

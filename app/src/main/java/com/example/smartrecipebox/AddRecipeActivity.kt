@@ -6,8 +6,10 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.smartrecipebox.data.RecipeRepository
-import com.example.smartrecipebox.models.Recipe
+import com.example.smartrecipebox.models.NewRecipeRequest
+import kotlinx.coroutines.launch
 
 class AddRecipeActivity : AppCompatActivity() {
 
@@ -78,19 +80,30 @@ class AddRecipeActivity : AppCompatActivity() {
             // Split tags into a Set<String> (matching your Recipe model)
             val tagsSet = tagsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
 
-            // Create and save new recipe
-            val newRecipe = Recipe(
-                id = System.currentTimeMillis().toString(),
+            val newRecipe = NewRecipeRequest(
                 title = name,
                 timeMinutes = timeMinutes,
                 ingredients = ingredientsList,
                 tags = tagsSet
             )
 
-            RecipeRepository.addRecipe(newRecipe)
+            // disabe double tap of button
+            btnSave.isEnabled = false
 
-            Toast.makeText(this, "Recipe Saved Successfully!", Toast.LENGTH_SHORT).show()
-            finish() // Close activity and return to list
+            lifecycleScope.launch {
+                try {
+                    RecipeRepository.addRecipe(newRecipe)
+                    Toast.makeText(this@AddRecipeActivity, "Recipe Saved Successfully!", Toast.LENGTH_SHORT).show()
+                    finish() // Close activity and return to list
+                } catch (e: Exception) {
+                    btnSave.isEnabled = true
+                    Toast.makeText(
+                        this@AddRecipeActivity,
+                        "Failed to save recipe: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
     }
 }

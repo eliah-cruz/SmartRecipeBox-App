@@ -15,16 +15,16 @@ import androidx.fragment.app.Fragment
 import com.example.smartrecipebox.R
 import com.example.smartrecipebox.applyTextGradient
 import com.example.smartrecipebox.data.RecipeRepository
+import com.example.smartrecipebox.models.Recipe
 
 class RecipeDetailFragment : Fragment() {
 
-    private var recipeId: String? = null
+    private var targetRecipe: Recipe? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            recipeId = it.getString(ARG_RECIPE_ID)
-        }
+        @Suppress("DEPRECATION")
+        targetRecipe = arguments?.getSerializable(ARG_RECIPE) as? Recipe
     }
 
     override fun onCreateView(
@@ -45,8 +45,6 @@ class RecipeDetailFragment : Fragment() {
         val ingredientsContainer = view.findViewById<LinearLayout>(R.id.ingredients_list_container)
         val btnTimer = view.findViewById<Button>(R.id.btn_start_timer)
         val btnShare = view.findViewById<Button>(R.id.btn_share_recipe)
-
-        val targetRecipe = RecipeRepository.getAllRecipes().find { it.id == recipeId }
 
         targetRecipe?.let { currentRecipe ->
             tvTitle.text = currentRecipe.title
@@ -105,12 +103,12 @@ class RecipeDetailFragment : Fragment() {
     }
 
     companion object {
-        private const val ARG_RECIPE_ID = "recipe_id_arg"
+        private const val ARG_RECIPE = "recipe_arg"
 
-        fun newInstance(recipeId: String): RecipeDetailFragment {
+        fun newInstance(recipe: Recipe): RecipeDetailFragment {
             val fragment = RecipeDetailFragment()
             val args = Bundle()
-            args.putString(ARG_RECIPE_ID, recipeId)
+            args.putSerializable(ARG_RECIPE, recipe)
             fragment.arguments = args
             return fragment
         }
