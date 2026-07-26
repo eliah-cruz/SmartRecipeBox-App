@@ -1,6 +1,8 @@
 package com.example.smartrecipebox.data
 
-// Connect to Supabase
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.postgrest.Postgrest
 
 object SupabaseManager {
     private const val SUPABASE_URL = "https://vguosydclnybswfxyavs.supabase.co"
