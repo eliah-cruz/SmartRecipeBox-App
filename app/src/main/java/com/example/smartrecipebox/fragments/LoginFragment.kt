@@ -1,5 +1,6 @@
 package com.example.smartrecipebox.fragments
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
