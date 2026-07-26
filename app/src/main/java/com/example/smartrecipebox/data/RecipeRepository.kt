@@ -9,12 +9,12 @@ object RecipeRepository {
 
     val tagEmojiMap: Map<String, String> = mapOf(
         "Breakfast" to "🍳",
+        "Lunch" to "🍱",
         "Quick" to "⚡",
         "Dinner" to "🍲",
         "Vegan" to "🥗",
         "Healthy" to "🍎",
         "Soup" to "🥣",
-        "Sweet" to "🍬",
         "Dessert" to "🍰"
     )
 

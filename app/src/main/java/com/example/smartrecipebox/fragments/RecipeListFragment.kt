@@ -31,6 +31,8 @@ class RecipeListFragment : Fragment() {
 
     private var cachedRecipes: List<Recipe> = emptyList()
 
+    private lateinit var filterButtons: Map<Button, String?>
+
     // Handler to debounce search typing and prevent glitchy rapid re-draws
     private val searchHandler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
@@ -129,14 +131,19 @@ class RecipeListFragment : Fragment() {
             (activity as MainActivity).loadFragment(LoginFragment())
         }
 
-        val filters = listOf(
-            R.id.chip_all to null,
-            R.id.chip_quick to "Quick",
-            R.id.chip_breakfast to "Breakfast",
-            R.id.chip_dinner to "Dinner",
-            R.id.chip_dessert to "Dessert"
+        filterButtons = mapOf(
+            view.findViewById<Button>(R.id.chip_all) to null,
+            view.findViewById<Button>(R.id.chip_quick) to "Quick",
+            view.findViewById<Button>(R.id.chip_breakfast) to "Breakfast",
+            view.findViewById<Button>(R.id.chip_lunch) to "Lunch",
+            view.findViewById<Button>(R.id.chip_dinner) to "Dinner",
+            view.findViewById<Button>(R.id.chip_vegan) to "Vegan",
+            view.findViewById<Button>(R.id.chip_healthy) to "Healthy",
+            view.findViewById<Button>(R.id.chip_soup) to "Soup",
+            view.findViewById<Button>(R.id.chip_dessert) to "Dessert"
         )
-        filters.forEach { (id, tag) -> view.findViewById<Button>(id).setOnClickListener { filterByTag(tag) } }
+        filterButtons.forEach { (btn, tag) -> btn.setOnClickListener { filterByTag(tag) } }
+        updateChipHighlight()
 
         fetchRecipes()
         return view
@@ -166,14 +173,29 @@ class RecipeListFragment : Fragment() {
 
     private fun filterByTag(tag: String?) {
         activeTagFilter = tag
+        updateChipHighlight()
         updateList()
+    }
+
+    // dims inactive tags
+    private fun updateChipHighlight() {
+        if (!::filterButtons.isInitialized) return
+        filterButtons.forEach { (btn, tag) ->
+            btn.alpha = if (tag == activeTagFilter) 1.0f else 0.55f
+        }
     }
 
     private fun updateList() {
         recipeListContainer.removeAllViews()
         val list = RecipeRepository.filterRecipes(cachedRecipes) { r ->
             val mS = r.title.lowercase().contains(activeSearchText)
-            val mT = activeTagFilter?.let { if (it == "Quick") r.isQuick() else r.tags.contains(it) } ?: true
+            val mT = activeTagFilter?.let { filterTag ->
+                if (filterTag == "Quick") {
+                    r.isQuick()
+                } else {
+                    r.tags.any { it.equals(filterTag, ignoreCase = true) }
+                }
+            } ?: true
             mS && mT
         }
 
