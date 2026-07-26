@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
 }
 
 android {
@@ -35,19 +36,7 @@ android {
     }
 }
 
-// This block forces Gradle to use the locally cached 1.8.20 library
-configurations.all {
-    resolutionStrategy {
-        force("org.jetbrains.kotlin:kotlin-stdlib:1.8.20")
-        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20")
-        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.20")
-    }
-}
-
 dependencies {
-    // Force the cached 1.8.20 stdlib
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.20")
-
     // Use highly stable older versions of standard libraries
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -60,4 +49,10 @@ dependencies {
 
     // Add this line to load high-definition images from URLs
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    // Supabase
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.7.0"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.ktor:ktor-client-android:3.5.1")
 }
