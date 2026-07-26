@@ -67,6 +67,11 @@ class SignUpFragment : Fragment(R.layout.fragment_signup) {
                 val sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
                 sharedPreferences.edit().putBoolean("isLoggedIn", true).apply()
 
+                SupabaseManager.supabase.auth.signUpWith(Email) {
+                    this.email = email
+                    this.password = password
+                }
+
                 Toast.makeText(requireContext(), "Account Created!", Toast.LENGTH_SHORT).show()
                 (activity as MainActivity).loadFragment(IntroFragment())
             }
