@@ -12,10 +12,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.smartrecipebox.R
 import com.example.smartrecipebox.applyTextGradient
 import com.example.smartrecipebox.data.RecipeRepository
 import com.example.smartrecipebox.models.Recipe
+import kotlinx.coroutines.launch
 
 class RecipeDetailFragment : Fragment() {
 
@@ -37,6 +39,7 @@ class RecipeDetailFragment : Fragment() {
         view.startAnimation(animation)
 
         val btnBack = view.findViewById<Button>(R.id.btn_back)
+        val btnDelete = view.findViewById<Button>(R.id.btn_delete) // 1. Find the Delete Button
         val tvTitle = view.findViewById<TextView>(R.id.tv_detail_title)
         tvTitle.applyTextGradient(R.color.primary, R.color.accent)
 
@@ -91,6 +94,30 @@ class RecipeDetailFragment : Fragment() {
                     putExtra(Intent.EXTRA_TEXT, textBody)
                 }
                 startActivity(Intent.createChooser(intent, "Share Recipe via:"))
+            }
+
+            // 2. DELETE BUTTON LOGIC
+            btnDelete.setOnClickListener {
+                // Check if the recipe ID is not null before proceeding
+                val recipeId = currentRecipe.id ?: run {
+                    Toast.makeText(context, "Cannot delete: Recipe ID is missing", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                lifecycleScope.launch {
+                    try {
+                        // Pass the non-null recipeId string
+                        RecipeRepository.deleteRecipe(recipeId)
+
+                        // Show success toast
+                        Toast.makeText(context, "${currentRecipe.title} deleted!", Toast.LENGTH_SHORT).show()
+
+                        // Navigate back to the previous screen
+                        parentFragmentManager.popBackStack()
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Failed to delete recipe: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
 
