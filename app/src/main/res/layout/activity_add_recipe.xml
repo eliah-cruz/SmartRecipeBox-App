@@ -104,28 +104,127 @@
             android:textColorHint="@color/text_secondary"
             android:textSize="16sp" />
 
-        <!-- Tags Section -->
+        <!-- Tags Section with Checkboxes -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tags"
+            android:text="🏷️ Select Category Tags"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
-            android:layout_marginBottom="6dp"/>
+            android:layout_marginBottom="8dp"/>
 
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2"
+            android:layout_marginBottom="12dp">
+
+            <CheckBox
+                android:id="@+id/cb_quick"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="⚡ Quick"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/cb_breakfast"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="🍳 Breakfast"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/cb_lunch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="🍱 Lunch"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/cb_dinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="🍲 Dinner"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/cb_vegan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="🥗 Vegan"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/cb_healthy"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="🍎 Healthy"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/cb_soup"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="🥣 Soup"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/cb_sweet"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="🍬 Sweet"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/cb_dessert"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="🍰 Dessert"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <CheckBox
+                android:id="@+id/cb_other"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:text="✏️ Other..."
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+        </GridLayout>
+
+        <!-- Hidden Custom Tag EditText (Revealed when 'Other' is checked) -->
         <EditText
-            android:id="@+id/et_tags"
+            android:id="@+id/et_other_tags"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="24dp"
             android:background="@drawable/input_field_background"
-            android:hint="e.g. Dinner, Quick, Healthy"
+            android:hint="Type custom tags separated by commas"
             android:inputType="text"
             android:padding="16dp"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_secondary"
-            android:textSize="16sp" />
+            android:textSize="15sp"
+            android:visibility="gone" />
 
         <!-- Standard Button -->
         <Button
