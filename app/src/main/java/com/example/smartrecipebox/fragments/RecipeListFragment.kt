@@ -13,10 +13,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.smartrecipebox.*
 import com.example.smartrecipebox.data.RecipeRepository
 import com.example.smartrecipebox.models.Recipe
 import com.example.smartrecipebox.models.isQuick
+import kotlinx.coroutines.launch
 
 class RecipeListFragment : Fragment() {
 
@@ -26,6 +28,9 @@ class RecipeListFragment : Fragment() {
     private var activeSearchText: String = ""
     private var lastClickTime = 0L
     private var scrollXPosition = 0
+
+    private var cachedRecipes: List<Recipe> = emptyList()
+    private lateinit var filterButtons: Map<Button, String?>
 
     // Handler to debounce search typing and prevent glitchy rapid re-draws
     private val searchHandler = Handler(Looper.getMainLooper())
@@ -125,17 +130,41 @@ class RecipeListFragment : Fragment() {
             (activity as MainActivity).loadFragment(LoginFragment())
         }
 
-        val filters = listOf(
-            R.id.chip_all to null,
-            R.id.chip_quick to "Quick",
-            R.id.chip_breakfast to "Breakfast",
-            R.id.chip_dinner to "Dinner",
-            R.id.chip_dessert to "Dessert"
+        filterButtons = mapOf(
+            view.findViewById<Button>(R.id.chip_all) to null,
+            view.findViewById<Button>(R.id.chip_quick) to "Quick",
+            view.findViewById<Button>(R.id.chip_breakfast) to "Breakfast",
+            view.findViewById<Button>(R.id.chip_lunch) to "Lunch",
+            view.findViewById<Button>(R.id.chip_dinner) to "Dinner",
+            view.findViewById<Button>(R.id.chip_vegan) to "Vegan",
+            view.findViewById<Button>(R.id.chip_healthy) to "Healthy",
+            view.findViewById<Button>(R.id.chip_soup) to "Soup",
+            view.findViewById<Button>(R.id.chip_sweet) to "Sweet",
+            view.findViewById<Button>(R.id.chip_dessert) to "Dessert"
         )
-        filters.forEach { (id, tag) -> view.findViewById<Button>(id).setOnClickListener { filterByTag(tag) } }
+        filterButtons.forEach { (btn, tag) -> btn.setOnClickListener { filterByTag(tag) } }
 
-        updateList()
+        updateChipHighlight()
+        fetchRecipes()
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::recipeListContainer.isInitialized) {
+            fetchRecipes()
+        }
+    }
+
+    private fun fetchRecipes() {
+        lifecycleScope.launch {
+            try {
+                cachedRecipes = RecipeRepository.fetchAllRecipes()
+                updateList()
+            } catch (e: Exception) {
+                Toast.makeText(context, "Couldn't load recipes: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun etsearchWidthMinusDrawable(editText: EditText, drawable: android.graphics.drawable.Drawable): Float {
@@ -144,15 +173,46 @@ class RecipeListFragment : Fragment() {
 
     private fun filterByTag(tag: String?) {
         activeTagFilter = tag
+        updateChipHighlight()
         updateList()
+    }
+
+    // dims inactive tags
+    private fun updateChipHighlight() {
+        if (!::filterButtons.isInitialized) return
+        filterButtons.forEach { (btn, tag) ->
+            btn.alpha = if (tag == activeTagFilter) 1.0f else 0.55f
+        }
     }
 
     private fun updateList() {
         recipeListContainer.removeAllViews()
-        val list = RecipeRepository.filterRecipes { r ->
+
+        val list = RecipeRepository.filterRecipes(cachedRecipes) { r ->
             val mS = r.title.lowercase().contains(activeSearchText)
-            val mT = activeTagFilter?.let { if (it == "Quick") r.isQuick() else r.tags.contains(it) } ?: true
+            val mT = activeTagFilter?.let { filterTag ->
+                if (filterTag == "Quick") {
+                    r.isQuick()
+                } else {
+                    r.tags.any { it.equals(filterTag, ignoreCase = true) }
+                }
+            } ?: true
             mS && mT
+        }
+
+        if (list.isEmpty()) {
+            val emptyTv = TextView(context).apply {
+                text = if (activeSearchText.isNotEmpty() || activeTagFilter != null) {
+                    "No recipes match your search filter."
+                } else {
+                    "No recipes yet!\nClick '+ Add' above to create one! 🍳"
+                }
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                textSize = 16f
+                setPadding(32, 64, 32, 64)
+            }
+            recipeListContainer.addView(emptyTv)
+            return
         }
 
         for (recipe in list) {
@@ -175,7 +235,8 @@ class RecipeListFragment : Fragment() {
         if (System.currentTimeMillis() - lastClickTime < 500) return
         lastClickTime = System.currentTimeMillis()
 
-        val f = RecipeDetailFragment.newInstance(recipe.id)
+        // Pass the whole Recipe object we already have -- no need to re-fetch it.
+        val f = RecipeDetailFragment.newInstance(recipe)
         parentFragmentManager.beginTransaction()
             .setCustomAnimations(
                 R.anim.slide_up_fade_in,

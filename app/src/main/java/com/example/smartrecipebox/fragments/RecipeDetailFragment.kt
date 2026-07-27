@@ -2,7 +2,6 @@ package com.example.smartrecipebox.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.AlarmClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,19 +11,35 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.smartrecipebox.R
 import com.example.smartrecipebox.applyTextGradient
 import com.example.smartrecipebox.data.RecipeRepository
+import com.example.smartrecipebox.models.Recipe
+import kotlinx.coroutines.launch
+
+import android.content.Context
+import android.media.RingtoneManager
+import android.os.Build
+import android.os.CountDownTimer
+import android.os.VibrationEffect
+import android.os.Vibrator
 
 class RecipeDetailFragment : Fragment() {
 
-    private var recipeId: String? = null
+    private var targetRecipe: Recipe? = null
+
+    private var countDownTimer: CountDownTimer? = null
+    private enum class TimerState {
+        STOPPED, RUNNING, PAUSED
+    }
+    private var timerState = TimerState.STOPPED
+    private var millisRemaining: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            recipeId = it.getString(ARG_RECIPE_ID)
-        }
+        @Suppress("DEPRECATION")
+        targetRecipe = arguments?.getSerializable(ARG_RECIPE) as? Recipe
     }
 
     override fun onCreateView(
@@ -37,6 +52,7 @@ class RecipeDetailFragment : Fragment() {
         view.startAnimation(animation)
 
         val btnBack = view.findViewById<Button>(R.id.btn_back)
+        val btnDelete = view.findViewById<Button>(R.id.btn_delete) // 1. Find the Delete Button
         val tvTitle = view.findViewById<TextView>(R.id.tv_detail_title)
         tvTitle.applyTextGradient(R.color.primary, R.color.accent)
 
@@ -46,7 +62,7 @@ class RecipeDetailFragment : Fragment() {
         val btnTimer = view.findViewById<Button>(R.id.btn_start_timer)
         val btnShare = view.findViewById<Button>(R.id.btn_share_recipe)
 
-        val targetRecipe = RecipeRepository.getAllRecipes().find { it.id == recipeId }
+        val tvTimerDisplay = view.findViewById<TextView>(R.id.tv_timer_display)
 
         targetRecipe?.let { currentRecipe ->
             tvTitle.text = currentRecipe.title
@@ -65,17 +81,28 @@ class RecipeDetailFragment : Fragment() {
                 ingredientsContainer.addView(itemLayout)
             }
 
+            // tap to start -> pause -> resume
             btnTimer.setOnClickListener {
-                val intent = Intent(AlarmClock.ACTION_SET_TIMER).apply {
-                    putExtra(AlarmClock.EXTRA_LENGTH, currentRecipe.timeMinutes * 60)
-                    putExtra(AlarmClock.EXTRA_MESSAGE, "Cook: ${currentRecipe.title}")
-                    putExtra(AlarmClock.EXTRA_SKIP_UI, false)
+                when (timerState) {
+                    TimerState.STOPPED -> {
+                        millisRemaining = currentRecipe.timeMinutes * 60 * 1000L
+                        startTimer(tvTimerDisplay, btnTimer)
+                    }
+                    TimerState.RUNNING -> {
+                        pauseTimer(btnTimer)
+                    }
+                    TimerState.PAUSED -> {
+                        startTimer(tvTimerDisplay, btnTimer)
+                    }
                 }
-                if (intent.resolveActivity(requireActivity().packageManager) != null) {
-                    startActivity(intent)
-                } else {
-                    Toast.makeText(context, "No timer application found.", Toast.LENGTH_LONG).show()
-                }
+            }
+
+            // long press to reset
+            btnTimer.setOnLongClickListener {
+                if (timerState != TimerState.STOPPED) {
+                    cancelTimer(tvTimerDisplay, btnTimer)
+                    true
+                } else false
             }
 
             btnShare.setOnClickListener {
@@ -94,6 +121,30 @@ class RecipeDetailFragment : Fragment() {
                 }
                 startActivity(Intent.createChooser(intent, "Share Recipe via:"))
             }
+
+            // 2. DELETE BUTTON LOGIC
+            btnDelete.setOnClickListener {
+                // Check if the recipe ID is not null before proceeding
+                val recipeId = currentRecipe.id ?: run {
+                    Toast.makeText(context, "Cannot delete: Recipe ID is missing", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                lifecycleScope.launch {
+                    try {
+                        // Pass the non-null recipeId string
+                        RecipeRepository.deleteRecipe(recipeId)
+
+                        // Show success toast
+                        Toast.makeText(context, "${currentRecipe.title} deleted!", Toast.LENGTH_SHORT).show()
+
+                        // Navigate back to the previous screen
+                        parentFragmentManager.popBackStack()
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Failed to delete recipe: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
 
         // BACK BUTTON ANIMATION GOING BACK TO LIST
@@ -104,13 +155,85 @@ class RecipeDetailFragment : Fragment() {
         return view
     }
 
-    companion object {
-        private const val ARG_RECIPE_ID = "recipe_id_arg"
+    private fun startTimer(tvTimerDisplay: TextView, btnTimer: Button) {
+        timerState = TimerState.RUNNING
+        tvTimerDisplay.visibility = View.VISIBLE
+        btnTimer.text = "⏸ Pause Timer (Hold to Reset)"
+        updateTimerText(tvTimerDisplay, millisRemaining)
 
-        fun newInstance(recipeId: String): RecipeDetailFragment {
+        countDownTimer = object : CountDownTimer(millisRemaining, 1000L) {
+            override fun onTick(millisUntilFinished: Long) {
+                millisRemaining = millisUntilFinished
+                updateTimerText(tvTimerDisplay, millisUntilFinished)
+            }
+
+            override fun onFinish() {
+                timerState = TimerState.STOPPED
+                millisRemaining = 0L
+                tvTimerDisplay.text = "Time's up! 🎉"
+                btnTimer.text = context?.getString(R.string.start_timer) ?: "Start Timer"
+                playFinishAlert()
+            }
+        }.start()
+    }
+
+    private fun pauseTimer(btnTimer: Button) {
+        countDownTimer?.cancel()
+        timerState = TimerState.PAUSED
+        btnTimer.text = "▶ Resume Timer (Hold to Reset)"
+    }
+
+    private fun cancelTimer(tvTimerDisplay: TextView, btnTimer: Button) {
+        countDownTimer?.cancel()
+        countDownTimer = null
+        timerState = TimerState.STOPPED
+        millisRemaining = 0L
+        tvTimerDisplay.visibility = View.GONE
+        btnTimer.text = context?.getString(R.string.start_timer) ?: "Start Timer"
+    }
+
+    private fun updateTimerText(tvTimerDisplay: TextView, millisRemaining: Long) {
+        val totalSeconds = millisRemaining / 1000
+        val minutesPart = totalSeconds / 60
+        val secondsPart = totalSeconds % 60
+        tvTimerDisplay.text = String.format("%02d:%02d", minutesPart, secondsPart)
+    }
+
+    private fun playFinishAlert() {
+        val ctx = context ?: return
+
+        try {
+            val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            RingtoneManager.getRingtone(ctx, soundUri)?.play()
+        } catch (e: Exception) {
+            // ignore audio issues
+        }
+
+        val vibrator = ctx.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        if (vibrator != null && vibrator.hasVibrator()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(500)
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        countDownTimer?.cancel()
+        countDownTimer = null
+        timerState = TimerState.STOPPED
+    }
+
+    companion object {
+        private const val ARG_RECIPE = "recipe_arg"
+
+        fun newInstance(recipe: Recipe): RecipeDetailFragment {
             val fragment = RecipeDetailFragment()
             val args = Bundle()
-            args.putString(ARG_RECIPE_ID, recipeId)
+            args.putSerializable(ARG_RECIPE, recipe)
             fragment.arguments = args
             return fragment
         }

@@ -1,13 +1,19 @@
 package com.example.smartrecipebox
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.smartrecipebox.data.RecipeRepository
+import com.example.smartrecipebox.data.SupabaseManager
 import com.example.smartrecipebox.models.Recipe
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.launch
 
 class AddRecipeActivity : AppCompatActivity() {
 
@@ -24,9 +30,26 @@ class AddRecipeActivity : AppCompatActivity() {
         val etName = findViewById<EditText>(R.id.et_recipe_name)
         val etTime = findViewById<EditText>(R.id.et_cook_time)
         val etIngredients = findViewById<EditText>(R.id.et_ingredients)
-        val etTags = findViewById<EditText>(R.id.et_tags)
         val btnSave = findViewById<Button>(R.id.btn_save_recipe)
         val btnBack = findViewById<Button>(R.id.btn_back)
+
+        val tagCheckboxes = mapOf(
+            findViewById<CheckBox>(R.id.cb_quick) to "Quick",
+            findViewById<CheckBox>(R.id.cb_breakfast) to "Breakfast",
+            findViewById<CheckBox>(R.id.cb_lunch) to "Lunch",
+            findViewById<CheckBox>(R.id.cb_dinner) to "Dinner",
+            findViewById<CheckBox>(R.id.cb_vegan) to "Vegan",
+            findViewById<CheckBox>(R.id.cb_healthy) to "Healthy",
+            findViewById<CheckBox>(R.id.cb_soup) to "Soup",
+            findViewById<CheckBox>(R.id.cb_sweet) to "Sweet",
+            findViewById<CheckBox>(R.id.cb_dessert) to "Dessert"
+        )
+        val cbOther = findViewById<CheckBox>(R.id.cb_other)
+        val etOtherTags = findViewById<EditText>(R.id.et_other_tags)
+
+        cbOther.setOnCheckedChangeListener { _, isChecked ->
+            etOtherTags.visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
 
         // Standard Back button finish
         btnBack.setOnClickListener {
@@ -38,7 +61,6 @@ class AddRecipeActivity : AppCompatActivity() {
             val name = etName.text.toString().trim()
             val timeText = etTime.text.toString().trim()
             val ingredientsText = etIngredients.text.toString().trim()
-            val tagsText = etTags.text.toString().trim()
 
             // 1. Check if every single box is filled out
             var isFormValid = true
@@ -58,14 +80,27 @@ class AddRecipeActivity : AppCompatActivity() {
                 isFormValid = false
             }
 
-            if (tagsText.isEmpty()) {
-                etTags.error = "Tags are required"
-                isFormValid = false
+            val selectedTags = mutableSetOf<String>()
+            tagCheckboxes.forEach { (cb, tag) ->
+                if (cb.isChecked) {
+                    selectedTags.add(tag)
+                }
             }
 
-            // 2. If any box is empty, stop here and do not save.
+            if (cbOther.isChecked) {
+                val customText = etOtherTags.text.toString().trim()
+                if (customText.isNotEmpty()) {
+                    val customTags = customText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                    selectedTags.addAll(customTags)
+                }
+            }
+
+            if (selectedTags.isEmpty()) {
+                Toast.makeText(this, "Please select at least one tag.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (!isFormValid) {
-                Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -75,22 +110,36 @@ class AddRecipeActivity : AppCompatActivity() {
             // Split ingredients into a List<String>
             val ingredientsList = ingredientsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
-            // Split tags into a Set<String> (matching your Recipe model)
-            val tagsSet = tagsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+            // disabe double tap of button
+            btnSave.isEnabled = false
 
-            // Create and save new recipe
-            val newRecipe = Recipe(
-                id = System.currentTimeMillis().toString(),
-                title = name,
-                timeMinutes = timeMinutes,
-                ingredients = ingredientsList,
-                tags = tagsSet
-            )
+            lifecycleScope.launch {
+                try {
+                    val currentUserId = SupabaseManager.client.auth.currentUserOrNull()?.id
 
-            RecipeRepository.addRecipe(newRecipe)
+                    if (currentUserId == null) {
+                        Toast.makeText(this@AddRecipeActivity, "Please log in first!", Toast.LENGTH_SHORT).show()
+                        return@launch
+                    }
 
-            Toast.makeText(this, "Recipe Saved Successfully!", Toast.LENGTH_SHORT).show()
-            finish() // Close activity and return to list
+                    val recipe = Recipe(
+                        id = null,
+                        userId = currentUserId,
+                        title = name,
+                        timeMinutes = timeMinutes,
+                        ingredients = ingredientsList,
+                        tags = selectedTags
+                    )
+
+                    RecipeRepository.addRecipe(recipe)
+
+                    Toast.makeText(this@AddRecipeActivity, "Recipe Saved Successfully!", Toast.LENGTH_SHORT).show()
+                    finish() // Close activity and return to list
+                } catch (e: Exception) {
+                    btnSave.isEnabled = true
+                    Toast.makeText(this@AddRecipeActivity, "Failed to save recipe: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 }

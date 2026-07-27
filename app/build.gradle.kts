@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.4.10"
 }
 
 android {
@@ -27,27 +28,24 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
-// This block forces Gradle to use the locally cached 1.8.20 library
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
+}
+
 configurations.all {
     resolutionStrategy {
-        force("org.jetbrains.kotlin:kotlin-stdlib:1.8.20")
-        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20")
-        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.20")
+        force("androidx.browser:browser:1.8.0")
     }
 }
 
 dependencies {
-    // Force the cached 1.8.20 stdlib
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.20")
-
     // Use highly stable older versions of standard libraries
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -60,4 +58,12 @@ dependencies {
 
     // Add this line to load high-definition images from URLs
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    // Supabase
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.7.0"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.ktor:ktor-client-android:3.5.1")
 }
+
+

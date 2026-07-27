@@ -75,12 +75,12 @@
             android:drawableStart="@android:drawable/ic_menu_search"
             android:drawableEnd="@android:drawable/ic_menu_close_clear_cancel"
             android:drawablePadding="12dp"
+            android:textColorHint="@color/text_hint"
             android:hint="@string/search_hint"
             android:inputType="text"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_secondary"
             android:textSize="15sp" />
 
         <!-- Filter Chips Horizontal Scroll -->
@@ -135,6 +135,18 @@
                     android:textSize="13sp" />
 
                 <Button
+                    android:id="@+id/chip_lunch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="🍱 Lunch"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <Button
                     android:id="@+id/chip_dinner"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
@@ -142,6 +154,54 @@
                     android:minWidth="0dp"
                     android:paddingHorizontal="16dp"
                     android:text="🍲 Dinner"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/chip_vegan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="🥗 Vegan"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/chip_healthy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="🍎 Healthy"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/chip_soup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="🥣 Soup"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/chip_sweet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="🍬 Sweet"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="13sp" />

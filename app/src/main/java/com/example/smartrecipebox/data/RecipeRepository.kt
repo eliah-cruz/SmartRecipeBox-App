@@ -1,12 +1,16 @@
 package com.example.smartrecipebox.data
 
+import com.example.smartrecipebox.data.SupabaseManager
 import com.example.smartrecipebox.models.Recipe
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.auth.auth
 
 object RecipeRepository {
-    val categoryArray: Array<String> = arrayOf("All", "Quick", "Breakfast", "Dinner", "Dessert")
+    val categoryArray: Array<String> = arrayOf("All", "Quick", "Breakfast", "Lunch", "Dinner", "Vegan", "Healthy", "Soup", "Sweet", "Dessert")
 
     val tagEmojiMap: Map<String, String> = mapOf(
         "Breakfast" to "🍳",
+        "Lunch" to "🍱",
         "Quick" to "⚡",
         "Dinner" to "🍲",
         "Vegan" to "🥗",
@@ -16,64 +20,29 @@ object RecipeRepository {
         "Dessert" to "🍰"
     )
 
-    private val recipesList = mutableListOf<Recipe>()
+    // fetch recipes
+    suspend fun fetchAllRecipes(): List<Recipe> {
+        SupabaseManager.client.auth.awaitInitialization()
 
-    init {
-        recipesList.addAll(
-            listOf(
-                Recipe(
-                    id = "1",
-                    title = "Classic Pancakes",
-                    timeMinutes = 15,
-                    ingredients = listOf("1 cup Flour", "1 Egg", "1 cup Milk", "2 tbsp Sugar", "1 pinch Salt"),
-                    tags = setOf("Breakfast", "Sweet", "Quick")
-                ),
-                Recipe(
-                    id = "2",
-                    title = "Garlic Noodles",
-                    timeMinutes = 25,
-                    ingredients = listOf("Noodles", "Chicken breast", "Garlic", "Soy Sauce", "Green onion"),
-                    tags = setOf("Dinner", "Quick")
-                ),
-                Recipe(
-                    id = "3",
-                    title = "Simple Summer Salad",
-                    timeMinutes = 10,
-                    ingredients = listOf("Lettuce", "Cherry Tomatoes", "Cucumber", "Olive Oil", "Lemon Juice"),
-                    tags = setOf("Vegan", "Quick", "Healthy")
-                ),
-                Recipe(
-                    id = "4",
-                    title = "Baked Banana Oats",
-                    timeMinutes = 35,
-                    ingredients = listOf("Oats", "1 Ripe Banana", "Almond Milk", "Honey", "Cinnamon"),
-                    tags = setOf("Breakfast", "Healthy")
-                ),
-                Recipe(
-                    id = "5",
-                    title = "Tomato Basil Soup",
-                    timeMinutes = 20,
-                    ingredients = listOf("Tomato Paste", "Heavy Cream", "Garlic", "Vegetable Broth", "Basil"),
-                    tags = setOf("Dinner", "Soup", "Quick")
-                ),
-                Recipe(
-                    id = "6",
-                    title = "Chocolate Mug Cake",
-                    timeMinutes = 5,
-                    ingredients = listOf("4 tbsp Flour", "2 tbsp Sugar", "1 tbsp Cocoa Powder", "3 tbsp Milk", "1 tbsp Butter"),
-                    tags = setOf("Dessert", "Sweet", "Quick")
-                )
-            )
-        )
+        val currentUserId = SupabaseManager.client.auth.currentSessionOrNull()?.user?.id
+        ?: SupabaseManager.client.auth.currentUserOrNull()?.id
+        ?: return emptyList()
+        
+        return SupabaseManager.client.from("recipes").select { filter { eq("user_id", currentUserId) } }.decodeList<Recipe>()
     }
 
-    fun getAllRecipes(): List<Recipe> = recipesList
-
-    fun addRecipe(recipe: Recipe) {
-        recipesList.add(recipe)
+    // insert recipes
+    suspend fun addRecipe(recipe: Recipe) {
+        SupabaseManager.client.from("recipes").insert(recipe)
     }
 
-    fun filterRecipes(predicate: (Recipe) -> Boolean): List<Recipe> {
-        return recipesList.filter(predicate)
+    suspend fun deleteRecipe(recipeId: String) {
+        SupabaseManager.client.from("recipes").delete {
+            filter { eq("id", recipeId) }
+        }
+    }
+
+    fun filterRecipes(recipes: List<Recipe>, predicate: (Recipe) -> Boolean): List<Recipe> {
+        return recipes.filter(predicate)
     }
 }

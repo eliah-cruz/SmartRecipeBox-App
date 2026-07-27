@@ -10,20 +10,44 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Back Navigation Row -->
-        <Button
-            android:id="@+id/btn_back"
-            android:layout_width="wrap_content"
-            android:layout_height="54dp"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/bg_primary_button"
-            android:text="◀ Back"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+        <!-- Navigation Row (Back & Delete) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
 
-        <!-- Large Recipe Title -->
+            <Button
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="54dp"
+                android:background="@drawable/bg_primary_button"
+                android:text="◀ Back"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Spacer to push Delete button to the right -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btn_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="54dp"
+                android:background="@drawable/bg_primary_button"
+                android:text="🗑 Delete"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Large Recipe Title  -->
         <TextView
             android:id="@+id/tv_detail_title"
             android:layout_width="match_parent"
@@ -32,6 +56,7 @@
             android:textSize="32sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
+            android:gravity="center"
             android:layout_marginBottom="20dp"/>
 
         <!-- Information Details container block -->
@@ -61,7 +86,7 @@
                 android:textColor="@color/text_secondary"/>
         </LinearLayout>
 
-        <!-- Section header -->
+        <!-- Section Header -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,6 +94,7 @@
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
+            android:gravity="center"
             android:layout_marginBottom="10dp"/>
 
         <!-- Ingredient dynamic block -->
@@ -82,11 +108,25 @@
             android:layout_marginBottom="24dp"
             android:elevation="1dp"/>
 
+        <!-- Live countdown display, hidden until a timer is running -->
+        <TextView
+            android:id="@+id/tv_timer_display"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:text="00:00"
+            android:textColor="@color/accent"
+            android:textSize="48sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
         <!-- Standardized high contrast primary buttons -->
         <Button
             android:id="@+id/btn_start_timer"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:layout_gravity="center"
             android:layout_marginBottom="16dp"
             android:background="@drawable/bg_primary_button"
             android:elevation="4dp"
@@ -100,6 +140,7 @@
             android:id="@+id/btn_share_recipe"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:layout_gravity="center"
             android:layout_marginBottom="24dp"
             android:background="@drawable/bg_primary_button"
             android:elevation="4dp"
