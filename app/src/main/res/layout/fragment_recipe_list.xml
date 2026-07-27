@@ -195,6 +195,18 @@
                     android:textSize="13sp" />
 
                 <Button
+                    android:id="@+id/chip_sweet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="🍬 Sweet"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <Button
                     android:id="@+id/chip_dessert"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
