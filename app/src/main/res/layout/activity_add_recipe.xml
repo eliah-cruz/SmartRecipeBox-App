@@ -49,11 +49,11 @@
             android:layout_height="56dp"
             android:layout_marginBottom="18dp"
             android:background="@drawable/input_field_background"
+            android:textColorHint="@color/text_hint"
             android:hint="e.g. Garlic Noodles"
             android:inputType="textCapWords"
             android:padding="16dp"
             android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_secondary"
             android:textSize="16sp" />
 
         <!-- Cook Time Section -->
@@ -72,11 +72,11 @@
             android:layout_height="56dp"
             android:layout_marginBottom="18dp"
             android:background="@drawable/input_field_background"
+            android:textColorHint="@color/text_hint"
             android:hint="e.g. 25"
             android:inputType="number"
             android:padding="16dp"
             android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_secondary"
             android:textSize="16sp" />
 
         <!-- Ingredients Section -->
@@ -96,12 +96,12 @@
             android:layout_marginBottom="18dp"
             android:background="@drawable/input_field_background"
             android:gravity="top|start"
+            android:textColorHint="@color/text_hint"
             android:hint="Separate items with commas"
             android:inputType="textMultiLine"
             android:minHeight="80dp"
             android:padding="16dp"
             android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_secondary"
             android:textSize="16sp" />
 
         <!-- Tags Section with Checkboxes -->
@@ -218,11 +218,11 @@
             android:layout_height="56dp"
             android:layout_marginBottom="24dp"
             android:background="@drawable/input_field_background"
+            android:textColorHint="@color/text_hint"
             android:hint="Type custom tags separated by commas"
             android:inputType="text"
             android:padding="16dp"
             android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_secondary"
             android:textSize="15sp"
             android:visibility="gone" />
 

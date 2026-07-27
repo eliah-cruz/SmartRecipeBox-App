@@ -75,12 +75,12 @@
             android:drawableStart="@android:drawable/ic_menu_search"
             android:drawableEnd="@android:drawable/ic_menu_close_clear_cancel"
             android:drawablePadding="12dp"
+            android:textColorHint="@color/text_hint"
             android:hint="@string/search_hint"
             android:inputType="text"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_secondary"
             android:textSize="15sp" />
 
         <!-- Filter Chips Horizontal Scroll -->
