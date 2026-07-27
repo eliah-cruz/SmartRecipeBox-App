@@ -13,6 +13,15 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.smartrecipebox.R
 import com.example.smartrecipebox.MainActivity
+import com.example.smartrecipebox.applyTextGradient
+
+import androidx.lifecycle.lifecycleScope
+import com.example.smartrecipebox.data.SupabaseManager
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class SignUpFragment : Fragment(R.layout.fragment_signup) {
 
@@ -26,18 +35,20 @@ class SignUpFragment : Fragment(R.layout.fragment_signup) {
         val btnSignUp = view.findViewById<Button>(R.id.btnSignUp)
         val txtGoToLogin = view.findViewById<TextView>(R.id.txtGoToLogin)
 
+        tvSignUpTitle.applyTextGradient(R.color.primary, R.color.accent)
+
         // Gradient for the title
-        val paint = tvSignUpTitle.paint
-        val width = paint.measureText(tvSignUpTitle.text.toString())
-        tvSignUpTitle.paint.shader = LinearGradient(
-            0f, 0f, width, 0f,
-            intArrayOf(
-                Color.parseColor("#FFD700"),
-                Color.parseColor("#FF5722")
-            ),
-            null,
-            Shader.TileMode.CLAMP
-        )
+        // val paint = tvSignUpTitle.paint
+        // val width = paint.measureText(tvSignUpTitle.text.toString())
+        // tvSignUpTitle.paint.shader = LinearGradient(
+        //     0f, 0f, width, 0f,
+        //     intArrayOf(
+        //         Color.parseColor("#FFD700"),
+        //         Color.parseColor("#FF5722")
+        //     ),
+        //     null,
+        //     Shader.TileMode.CLAMP
+        // )
 
         btnSignUp.setOnClickListener {
             val name = editName.text.toString().trim()
@@ -64,11 +75,27 @@ class SignUpFragment : Fragment(R.layout.fragment_signup) {
 
             // If everything is filled out, create the account!
             if (isFormValid) {
-                val sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-                sharedPreferences.edit().putBoolean("isLoggedIn", true).apply()
+                btnSignUp.isEnabled = false
+                lifecycleScope.launch {
+                    try {
+                        SupabaseManager.client.auth.signUpWith(Email) {
+                            this.email = email
+                            this.password = password
+                            data = buildJsonObject {
+                                put("name", name)
+                            }
+                        }
 
-                Toast.makeText(requireContext(), "Account Created!", Toast.LENGTH_SHORT).show()
-                (activity as MainActivity).loadFragment(IntroFragment())
+                        val sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().putBoolean("isLoggedIn", true).apply()
+
+                        Toast.makeText(requireContext(), "Account Created!", Toast.LENGTH_SHORT).show()
+                        (activity as MainActivity).loadFragment(IntroFragment())
+                    } catch (e: Exception) {
+                        btnSignUp.isEnabled = true
+                        Toast.makeText(requireContext(), "Signup failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
             }
         }
 
