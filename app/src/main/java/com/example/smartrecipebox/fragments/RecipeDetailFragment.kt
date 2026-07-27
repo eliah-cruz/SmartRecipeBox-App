@@ -2,7 +2,6 @@ package com.example.smartrecipebox.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.AlarmClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,9 +16,23 @@ import com.example.smartrecipebox.applyTextGradient
 import com.example.smartrecipebox.data.RecipeRepository
 import com.example.smartrecipebox.models.Recipe
 
+import android.content.Context
+import android.media.RingtoneManager
+import android.os.Build
+import android.os.CountDownTimer
+import android.os.VibrationEffect
+import android.os.Vibrator
+
 class RecipeDetailFragment : Fragment() {
 
     private var targetRecipe: Recipe? = null
+
+    private var countDownTimer: CountDownTimer? = null
+    private enum class TimerState {
+        STOPPED, RUNNING, PAUSED
+    }
+    private var timerState = TimerState.STOPPED
+    private var millisRemaining: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +59,8 @@ class RecipeDetailFragment : Fragment() {
         val btnTimer = view.findViewById<Button>(R.id.btn_start_timer)
         val btnShare = view.findViewById<Button>(R.id.btn_share_recipe)
 
+        val tvTimerDisplay = view.findViewById<TextView>(R.id.tv_timer_display)
+
         targetRecipe?.let { currentRecipe ->
             tvTitle.text = currentRecipe.title
             tvTime.text = "⏱️ Time: ${currentRecipe.timeMinutes} minutes"
@@ -63,17 +78,28 @@ class RecipeDetailFragment : Fragment() {
                 ingredientsContainer.addView(itemLayout)
             }
 
+            // tap to start -> pause -> resume
             btnTimer.setOnClickListener {
-                val intent = Intent(AlarmClock.ACTION_SET_TIMER).apply {
-                    putExtra(AlarmClock.EXTRA_LENGTH, currentRecipe.timeMinutes * 60)
-                    putExtra(AlarmClock.EXTRA_MESSAGE, "Cook: ${currentRecipe.title}")
-                    putExtra(AlarmClock.EXTRA_SKIP_UI, false)
+                when (timerState) {
+                    TimerState.STOPPED -> {
+                        millisRemaining = currentRecipe.timeMinutes * 60 * 1000L
+                        startTimer(tvTimerDisplay, btnTimer)
+                    }
+                    TimerState.RUNNING -> {
+                        pauseTimer(btnTimer)
+                    }
+                    TimerState.PAUSED -> {
+                        startTimer(tvTimerDisplay, btnTimer)
+                    }
                 }
-                if (intent.resolveActivity(requireActivity().packageManager) != null) {
-                    startActivity(intent)
-                } else {
-                    Toast.makeText(context, "No timer application found.", Toast.LENGTH_LONG).show()
-                }
+            }
+
+            // long press to reset
+            btnTimer.setOnLongClickListener {
+                if (timerState != TimerState.STOPPED) {
+                    cancelTimer(tvTimerDisplay, btnTimer)
+                    true
+                } else false
             }
 
             btnShare.setOnClickListener {
@@ -100,6 +126,78 @@ class RecipeDetailFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun startTimer(tvTimerDisplay: TextView, btnTimer: Button) {
+        timerState = TimerState.RUNNING
+        tvTimerDisplay.visibility = View.VISIBLE
+        btnTimer.text = "⏸ Pause Timer (Hold to Reset)"
+        updateTimerText(tvTimerDisplay, millisRemaining)
+
+        countDownTimer = object : CountDownTimer(millisRemaining, 1000L) {
+            override fun onTick(millisUntilFinished: Long) {
+                millisRemaining = millisUntilFinished
+                updateTimerText(tvTimerDisplay, millisUntilFinished)
+            }
+
+            override fun onFinish() {
+                timerState = TimerState.STOPPED
+                millisRemaining = 0L
+                tvTimerDisplay.text = "Time's up! 🎉"
+                btnTimer.text = context?.getString(R.string.start_timer) ?: "Start Timer"
+                playFinishAlert()
+            }
+        }.start()
+    }
+
+    private fun pauseTimer(btnTimer: Button) {
+        countDownTimer?.cancel()
+        timerState = TimerState.PAUSED
+        btnTimer.text = "▶ Resume Timer (Hold to Reset)"
+    }
+
+    private fun cancelTimer(tvTimerDisplay: TextView, btnTimer: Button) {
+        countDownTimer?.cancel()
+        countDownTimer = null
+        timerState = TimerState.STOPPED
+        millisRemaining = 0L
+        tvTimerDisplay.visibility = View.GONE
+        btnTimer.text = context?.getString(R.string.start_timer) ?: "Start Timer"
+    }
+
+    private fun updateTimerText(tvTimerDisplay: TextView, millisRemaining: Long) {
+        val totalSeconds = millisRemaining / 1000
+        val minutesPart = totalSeconds / 60
+        val secondsPart = totalSeconds % 60
+        tvTimerDisplay.text = String.format("%02d:%02d", minutesPart, secondsPart)
+    }
+
+    private fun playFinishAlert() {
+        val ctx = context ?: return
+
+        try {
+            val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            RingtoneManager.getRingtone(ctx, soundUri)?.play()
+        } catch (e: Exception) {
+            // ignore audio issues
+        }
+
+        val vibrator = ctx.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        if (vibrator != null && vibrator.hasVibrator()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(500)
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        countDownTimer?.cancel()
+        countDownTimer = null
+        timerState = TimerState.STOPPED
     }
 
     companion object {

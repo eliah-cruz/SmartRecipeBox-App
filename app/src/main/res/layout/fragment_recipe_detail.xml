@@ -82,6 +82,19 @@
             android:layout_marginBottom="24dp"
             android:elevation="1dp"/>
 
+        <!-- Live countdown display, hidden until a timer is running -->
+        <TextView
+            android:id="@+id/tv_timer_display"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:text="00:00"
+            android:textColor="@color/accent"
+            android:textSize="48sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
         <!-- Standardized high contrast primary buttons -->
         <Button
             android:id="@+id/btn_start_timer"
