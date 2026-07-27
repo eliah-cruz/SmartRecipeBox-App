@@ -31,6 +31,12 @@ object RecipeRepository {
         SupabaseManager.client.from("recipes").insert(recipe)
     }
 
+    suspend fun deleteRecipe(recipeId: String) {
+        SupabaseManager.client.from("recipes").delete {
+            filter { eq("id", recipeId) }
+        }
+    }
+
     fun filterRecipes(recipes: List<Recipe>, predicate: (Recipe) -> Boolean): List<Recipe> {
         return recipes.filter(predicate)
     }
