@@ -1,5 +1,6 @@
 package com.example.smartrecipebox.fragments
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
@@ -12,6 +13,13 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.smartrecipebox.R
 import com.example.smartrecipebox.MainActivity
+import com.example.smartrecipebox.applyTextGradient
+
+import androidx.lifecycle.lifecycleScope
+import com.example.smartrecipebox.data.SupabaseManager
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
+import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
@@ -24,18 +32,20 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val btnLogin = view.findViewById<Button>(R.id.btnLogin)
         val txtGoToSignUp = view.findViewById<TextView>(R.id.txtGoToSignUp)
 
+        tvLoginTitle.applyTextGradient(R.color.primary, R.color.accent)
+
         // Gradient for the title
-        val paint = tvLoginTitle.paint
-        val width = paint.measureText(tvLoginTitle.text.toString())
-        tvLoginTitle.paint.shader = LinearGradient(
-            0f, 0f, width, 0f,
-            intArrayOf(
-                Color.parseColor("#FFD700"),
-                Color.parseColor("#FF5722")
-            ),
-            null,
-            Shader.TileMode.CLAMP
-        )
+        // val paint = tvLoginTitle.paint
+        // val width = paint.measureText(tvLoginTitle.text.toString())
+        // tvLoginTitle.paint.shader = LinearGradient(
+        //     0f, 0f, width, 0f,
+        //     intArrayOf(
+        //         Color.parseColor("#FFD700"),
+        //         Color.parseColor("#FF5722")
+        //     ),
+        //     null,
+        //     Shader.TileMode.CLAMP
+        // )
 
         btnLogin.setOnClickListener {
             val email = editEmail.text.toString().trim()
@@ -56,8 +66,23 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
             // If everything is filled out, log them in!
             if (isFormValid) {
-                Toast.makeText(requireContext(), "Login Successfully!", Toast.LENGTH_SHORT).show()
-                (activity as MainActivity).loadFragment(IntroFragment())
+                btnLogin.isEnabled = false
+                lifecycleScope.launch {
+                    try {
+                        SupabaseManager.client.auth.signInWith(Email) {
+                            this.email = email
+                            this.password = password   
+                        }
+                        val sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().putBoolean("isLoggedIn", true).apply()
+
+                        Toast.makeText(requireContext(), "Login Successfully!", Toast.LENGTH_SHORT).show()
+                        (activity as MainActivity).loadFragment(IntroFragment())
+                    } catch (e: Exception) {
+                        btnLogin.isEnabled = true
+                        Toast.makeText(requireContext(), "Login failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
             }
         }
 
