@@ -5,7 +5,7 @@
     <color name="primary_dark">#BF360C</color>
     <color name="primary_variant">#BF360C</color>
     <color name="accent">#FF9100</color>
-    <color name="text_hint">#80FFFFFF</color>
+    <color name="text_hint">#80212121</color>
 
     <!-- Theme-Aware Card Gradients (Light) -->
     <color name="card_gradient_start">#FFFDFB</color>
