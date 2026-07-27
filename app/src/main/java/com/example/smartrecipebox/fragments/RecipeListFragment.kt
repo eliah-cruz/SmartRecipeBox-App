@@ -200,8 +200,20 @@ class RecipeListFragment : Fragment() {
             mS && mT
         }
 
-        // TODO: When recipe list is empty, UI prints "No recipes yet!\nClick '+ Add' above to create one! 🍳"
-        //       If nag search filter and walang recipe lumabas, UI prints "No recipes match your search filter."
+        if (list.isEmpty()) {
+            val emptyTv = TextView(context).apply {
+                text = if (activeSearchText.isNotEmpty() || activeTagFilter != null) {
+                    "No recipes match your search filter."
+                } else {
+                    "No recipes yet!\nClick '+ Add' above to create one! 🍳"
+                }
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                textSize = 16f
+                setPadding(32, 64, 32, 64)
+            }
+            recipeListContainer.addView(emptyTv)
+            return
+        }
 
         for (recipe in list) {
             val v = LayoutInflater.from(context).inflate(R.layout.item_recipe, recipeListContainer, false)
