@@ -22,7 +22,12 @@ object RecipeRepository {
 
     // fetch recipes
     suspend fun fetchAllRecipes(): List<Recipe> {
-        val currentUserId = SupabaseManager.client.auth.currentUserOrNull()?.id ?: return emptyList()
+        SupabaseManager.client.auth.awaitInitialization()
+
+        val currentUserId = SupabaseManager.client.auth.currentSessionOrNull()?.user?.id
+        ?: SupabaseManager.client.auth.currentUserOrNull()?.id
+        ?: return emptyList()
+        
         return SupabaseManager.client.from("recipes").select { filter { eq("user_id", currentUserId) } }.decodeList<Recipe>()
     }
 
