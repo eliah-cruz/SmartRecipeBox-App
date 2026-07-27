@@ -8,7 +8,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.smartrecipebox.data.RecipeRepository
-import com.example.smartrecipebox.models.NewRecipeRequest
+import com.example.smartrecipebox.data.SupabaseManager
+import com.example.smartrecipebox.models.Recipe
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.launch
 
 class AddRecipeActivity : AppCompatActivity() {
@@ -80,28 +82,34 @@ class AddRecipeActivity : AppCompatActivity() {
             // Split tags into a Set<String> (matching your Recipe model)
             val tagsSet = tagsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
 
-            val newRecipe = NewRecipeRequest(
-                title = name,
-                timeMinutes = timeMinutes,
-                ingredients = ingredientsList,
-                tags = tagsSet
-            )
-
             // disabe double tap of button
             btnSave.isEnabled = false
 
             lifecycleScope.launch {
                 try {
-                    RecipeRepository.addRecipe(newRecipe)
+                    val currentUserId = SupabaseManager.client.auth.currentUserOrNull()?.id
+
+                    if (currentUserId == null) {
+                        Toast.makeText(this@AddRecipeActivity, "Please log in first!", Toast.LENGTH_SHORT).show()
+                        return@launch
+                    }
+
+                    val recipe = Recipe(
+                        id = null,
+                        userId = currentUserId,
+                        title = name,
+                        timeMinutes = timeMinutes,
+                        ingredients = ingredientsList,
+                        tags = tagsSet
+                    )
+
+                    RecipeRepository.addRecipe(recipe)
+
                     Toast.makeText(this@AddRecipeActivity, "Recipe Saved Successfully!", Toast.LENGTH_SHORT).show()
                     finish() // Close activity and return to list
                 } catch (e: Exception) {
                     btnSave.isEnabled = true
-                    Toast.makeText(
-                        this@AddRecipeActivity,
-                        "Failed to save recipe: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this@AddRecipeActivity, "Failed to save recipe: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
