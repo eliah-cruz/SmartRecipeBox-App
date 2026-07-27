@@ -30,7 +30,6 @@ class RecipeListFragment : Fragment() {
     private var scrollXPosition = 0
 
     private var cachedRecipes: List<Recipe> = emptyList()
-
     private lateinit var filterButtons: Map<Button, String?>
 
     // Handler to debounce search typing and prevent glitchy rapid re-draws
@@ -140,11 +139,12 @@ class RecipeListFragment : Fragment() {
             view.findViewById<Button>(R.id.chip_vegan) to "Vegan",
             view.findViewById<Button>(R.id.chip_healthy) to "Healthy",
             view.findViewById<Button>(R.id.chip_soup) to "Soup",
+            view.findViewById<Button>(R.id.chip_sweet) to "Sweet",
             view.findViewById<Button>(R.id.chip_dessert) to "Dessert"
         )
         filterButtons.forEach { (btn, tag) -> btn.setOnClickListener { filterByTag(tag) } }
-        updateChipHighlight()
 
+        updateChipHighlight()
         fetchRecipes()
         return view
     }
@@ -159,7 +159,7 @@ class RecipeListFragment : Fragment() {
     private fun fetchRecipes() {
         lifecycleScope.launch {
             try {
-                cachedRecipes = RecipeRepository.getAllRecipes()
+                cachedRecipes = RecipeRepository.fetchAllRecipes()
                 updateList()
             } catch (e: Exception) {
                 Toast.makeText(context, "Couldn't load recipes: ${e.message}", Toast.LENGTH_LONG).show()
@@ -187,6 +187,7 @@ class RecipeListFragment : Fragment() {
 
     private fun updateList() {
         recipeListContainer.removeAllViews()
+
         val list = RecipeRepository.filterRecipes(cachedRecipes) { r ->
             val mS = r.title.lowercase().contains(activeSearchText)
             val mT = activeTagFilter?.let { filterTag ->
@@ -198,6 +199,9 @@ class RecipeListFragment : Fragment() {
             } ?: true
             mS && mT
         }
+
+        // TODO: When recipe list is empty, UI prints "No recipes yet!\nClick '+ Add' above to create one! 🍳"
+        //       If nag search filter and walang recipe lumabas, UI prints "No recipes match your search filter."
 
         for (recipe in list) {
             val v = LayoutInflater.from(context).inflate(R.layout.item_recipe, recipeListContainer, false)
