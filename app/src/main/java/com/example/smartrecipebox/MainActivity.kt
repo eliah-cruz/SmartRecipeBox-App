@@ -10,6 +10,8 @@ import com.example.smartrecipebox.fragments.LoginFragment
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeHelper.applyTheme(this)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
