@@ -106,6 +106,7 @@ class RecipeDetailFragment : Fragment() {
             }
 
             btnShare.setOnClickListener {
+                btnShare.isEnabled = false
                 val textBody = """
                     Check out this recipe:
                     ${currentRecipe.title} (${currentRecipe.timeMinutes} minutes)
@@ -120,6 +121,10 @@ class RecipeDetailFragment : Fragment() {
                     putExtra(Intent.EXTRA_TEXT, textBody)
                 }
                 startActivity(Intent.createChooser(intent, "Share Recipe via:"))
+
+                btnShare.postDelayed({
+                    btnShare.isEnabled = true
+                }, 1000)
             }
 
             // 2. DELETE BUTTON LOGIC
